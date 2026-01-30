@@ -1,0 +1,33 @@
+version: '3.8'
+
+# Development override - run with: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  mongodb:
+    ports:
+      - "27017:27017"
+
+  ollama:
+    # Remove GPU reservation for dev if no GPU available
+    deploy: {}
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/app:/app/app:ro  # Mount source for hot reload
+      - backend_uploads:/app/uploads
+      - backend_vectors:/app/vector_store
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - DEBUG=true
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend/src:/app/src:ro  # Mount source for dev
+    ports:
+      - "3000:80"

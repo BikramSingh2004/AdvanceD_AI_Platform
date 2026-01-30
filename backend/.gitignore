@@ -1,0 +1,87 @@
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+
+.vscode/
+.idea/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Python env files
+.env
+.env.*
+!.env.example
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# =========================
+# Node / Frontend
+# =========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite
+dist/
+.vite/
+
+# =========================
+# Build outputs
+# =========================
+build/
+out/
+
+# =========================
+# Docker
+# =========================
+*.log
+docker-data/
+docker-volumes/
+
+# =========================
+# Media uploads (CRITICAL)
+# =========================
+uploads/
+media/
+*.mp4
+*.mp3
+*.wav
+*.m4a
+*.webm
+*.pdf
+
+# =========================
+# Databases
+# =========================
+data/
+mongodb-data/
+
+# =========================
+# Cache / temp
+# =========================
+.cache/
+tmp/
+
+# =========================
+# Misc
+# =========================
+*.swp
+*.bak
+*.tmp
