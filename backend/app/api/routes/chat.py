@@ -3,16 +3,13 @@
 import json
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
-from motor.motor_asyncio import AsyncIOMotorDatabase
-
 from app.database import get_database
 from app.models import ChatMessage, ChatRequest, ChatResponse
-from app.services.llm import (
-    answer_question,
-    answer_question_stream,
-    check_ollama_connection,
-)
+from app.services.llm import (answer_question, answer_question_stream,
+                              check_ollama_connection)
+from fastapi import (APIRouter, Depends, HTTPException, WebSocket,
+                     WebSocketDisconnect)
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 

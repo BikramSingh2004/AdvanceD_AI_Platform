@@ -3,13 +3,12 @@
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-
 from app.api.routes import chat_router, documents_router, upload_router
 from app.config import get_settings
 from app.database import close_mongodb_connection, connect_to_mongodb
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 settings = get_settings()
 

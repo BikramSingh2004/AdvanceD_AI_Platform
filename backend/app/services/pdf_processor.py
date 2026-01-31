@@ -4,7 +4,6 @@ import asyncio
 from typing import List, Tuple
 
 import fitz  # PyMuPDF
-
 from app.config import get_settings
 
 settings = get_settings()

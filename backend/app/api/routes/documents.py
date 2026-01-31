@@ -3,12 +3,11 @@
 import os
 from typing import Optional
 
+from app.database import get_database
+from app.models import DocumentListResponse, DocumentResponse, FileType
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import FileResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
-
-from app.database import get_database
-from app.models import DocumentListResponse, DocumentResponse, FileType
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 

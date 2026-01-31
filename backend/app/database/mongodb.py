@@ -2,9 +2,8 @@
 
 from typing import Optional
 
-from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
-
 from app.config import get_settings
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 settings = get_settings()
 
