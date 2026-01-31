@@ -1,20 +1,21 @@
 """Pydantic models for the application."""
-from app.models.document import (
-    FileType,
-    TimestampSegment,
-    DocumentChunk,
-    DocumentBase,
-    DocumentCreate,
-    Document,
-    DocumentResponse,
-    DocumentListResponse,
-)
+
 from app.models.chat import (
+    ChatHistory,
     ChatMessage,
     ChatRequest,
     ChatResponse,
-    ChatHistory,
     StreamToken,
+)
+from app.models.document import (
+    Document,
+    DocumentBase,
+    DocumentChunk,
+    DocumentCreate,
+    DocumentListResponse,
+    DocumentResponse,
+    FileType,
+    TimestampSegment,
 )
 
 __all__ = [

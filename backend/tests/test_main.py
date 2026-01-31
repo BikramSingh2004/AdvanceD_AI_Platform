@@ -1,6 +1,8 @@
 """Tests for main application."""
+
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, AsyncMock
 
 
 class TestMainApp:
@@ -9,7 +11,7 @@ class TestMainApp:
     def test_root_endpoint(self, client):
         """Test root endpoint."""
         response = client.get("/")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "message" in data
@@ -19,7 +21,7 @@ class TestMainApp:
     def test_health_check(self, client):
         """Test health check endpoint."""
         response = client.get("/health")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert data["status"] == "healthy"
@@ -33,21 +35,21 @@ class TestMainApp:
                 "Access-Control-Request-Method": "GET",
             },
         )
-        
+
         # CORS should allow the origin
         assert response.status_code in [200, 204, 405]
 
     def test_api_docs_available(self, client):
         """Test OpenAPI docs are available."""
         response = client.get("/docs")
-        
+
         # Should redirect or return docs
         assert response.status_code in [200, 307]
 
     def test_openapi_schema(self, client):
         """Test OpenAPI schema is available."""
         response = client.get("/openapi.json")
-        
+
         assert response.status_code == 200
         data = response.json()
         assert "openapi" in data

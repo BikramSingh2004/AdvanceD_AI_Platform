@@ -3,12 +3,12 @@
 import asyncio
 import os
 import pickle
-from typing import List, Dict, Any, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 from app.config import get_settings
-from app.models import TimestampSegment, DocumentChunk
+from app.models import DocumentChunk, TimestampSegment
 from app.services.pdf_processor import chunk_text
 
 settings = get_settings()
@@ -276,7 +276,9 @@ def _remove_document_sync(document_id: str):
     """Synchronous removal - updates mappings and persists the store."""
     # Note: IndexFlatL2 does not support deletions; we remove mappings only.
     if document_id in _document_store:
-        indices_to_remove = [idx for idx, (doc_id, _) in _chunk_to_doc.items() if doc_id == document_id]
+        indices_to_remove = [
+            idx for idx, (doc_id, _) in _chunk_to_doc.items() if doc_id == document_id
+        ]
         for idx in indices_to_remove:
             if idx in _chunk_to_doc:
                 del _chunk_to_doc[idx]

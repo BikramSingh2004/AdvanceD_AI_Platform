@@ -1,7 +1,9 @@
 """Tests for configuration module."""
-import pytest
-from unittest.mock import patch
+
 import os
+from unittest.mock import patch
+
+import pytest
 
 
 class TestConfig:
@@ -10,9 +12,9 @@ class TestConfig:
     def test_default_settings(self):
         """Test default configuration values."""
         from app.config import Settings
-        
+
         settings = Settings()
-        
+
         assert settings.app_name == "AI Document Q&A"
         assert settings.debug is True
         assert settings.mongodb_url == "mongodb://localhost:27017"
@@ -27,20 +29,23 @@ class TestConfig:
     def test_get_settings_cached(self):
         """Test that get_settings returns cached instance."""
         from app.config import get_settings
-        
+
         settings1 = get_settings()
         settings2 = get_settings()
-        
+
         assert settings1 is settings2
 
     def test_settings_from_env(self):
         """Test settings can be loaded from environment."""
         from app.config import Settings
-        
-        with patch.dict(os.environ, {
-            "MONGODB_URL": "mongodb://testhost:27017",
-            "MONGODB_DB_NAME": "test_db",
-        }):
+
+        with patch.dict(
+            os.environ,
+            {
+                "MONGODB_URL": "mongodb://testhost:27017",
+                "MONGODB_DB_NAME": "test_db",
+            },
+        ):
             settings = Settings()
             assert settings.mongodb_url == "mongodb://testhost:27017"
             assert settings.mongodb_db_name == "test_db"
@@ -48,9 +53,9 @@ class TestConfig:
     def test_chunk_settings(self):
         """Test chunking configuration."""
         from app.config import Settings
-        
+
         settings = Settings()
-        
+
         assert settings.chunk_size == 512
         assert settings.chunk_overlap == 50
         assert settings.embedding_model == "all-MiniLM-L6-v2"
@@ -58,7 +63,7 @@ class TestConfig:
     def test_whisper_settings(self):
         """Test Whisper configuration."""
         from app.config import Settings
-        
+
         settings = Settings()
-        
+
         assert settings.whisper_model == "base"

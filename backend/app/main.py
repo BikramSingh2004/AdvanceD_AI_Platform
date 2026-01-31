@@ -1,13 +1,15 @@
 """Main FastAPI application."""
+
+import os
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import os
 
+from app.api.routes import chat_router, documents_router, upload_router
 from app.config import get_settings
-from app.database import connect_to_mongodb, close_mongodb_connection
-from app.api.routes import upload_router, documents_router, chat_router
+from app.database import close_mongodb_connection, connect_to_mongodb
 
 settings = get_settings()
 
@@ -17,16 +19,17 @@ async def lifespan(app: FastAPI):
     """Application lifespan events."""
     # Startup
     await connect_to_mongodb()
-    
+
     # Ensure upload directory exists
     os.makedirs(settings.upload_dir, exist_ok=True)
-    
+
     # Initialize vector store
     from app.services.vector_store import initialize_vector_store
+
     await initialize_vector_store()
-    
+
     yield
-    
+
     # Shutdown
     await close_mongodb_connection()
 

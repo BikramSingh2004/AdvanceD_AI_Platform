@@ -1,19 +1,21 @@
 """Pytest configuration and fixtures."""
+
+import asyncio
 import os
 import sys
-import pytest
-import asyncio
 from typing import AsyncGenerator, Generator
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 
 # Add backend to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from app.main import app
-from app.database.mongodb import mongodb
 from app.config import Settings
+from app.database.mongodb import mongodb
+from app.main import app
 
 
 @pytest.fixture(scope="session")
@@ -42,43 +44,52 @@ def mock_mongodb():
     mock_db.documents = MagicMock()
     mock_db.chunks = MagicMock()
     mock_db.chat_history = MagicMock()
-    
+
     # Configure async methods
     mock_db.documents.find_one = AsyncMock()
     mock_db.documents.insert_one = AsyncMock()
     mock_db.documents.update_one = AsyncMock()
     mock_db.documents.delete_one = AsyncMock()
-    mock_db.documents.find = MagicMock(return_value=MagicMock(
-        skip=MagicMock(return_value=MagicMock(
-            limit=MagicMock(return_value=MagicMock(
-                sort=MagicMock(return_value=MagicMock(
-                    to_list=AsyncMock(return_value=[])
-                ))
-            ))
-        ))
-    ))
+    mock_db.documents.find = MagicMock(
+        return_value=MagicMock(
+            skip=MagicMock(
+                return_value=MagicMock(
+                    limit=MagicMock(
+                        return_value=MagicMock(
+                            sort=MagicMock(
+                                return_value=MagicMock(
+                                    to_list=AsyncMock(return_value=[])
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    )
     mock_db.documents.count_documents = AsyncMock(return_value=0)
     mock_db.documents.create_index = AsyncMock()
-    
+
     mock_db.chunks.delete_many = AsyncMock()
     mock_db.chunks.create_index = AsyncMock()
-    
+
     mock_db.chat_history.find_one = AsyncMock()
     mock_db.chat_history.update_one = AsyncMock()
     mock_db.chat_history.delete_one = AsyncMock()
     mock_db.chat_history.delete_many = AsyncMock()
     mock_db.chat_history.create_index = AsyncMock()
-    
+
     return mock_db
 
 
 @pytest.fixture
 def mock_vector_store():
     """Mock vector store for testing."""
-    with patch("app.services.vector_store._faiss_index") as mock_index, \
-         patch("app.services.vector_store._document_store", {}), \
-         patch("app.services.vector_store._chunk_to_doc", {}), \
-         patch("app.services.vector_store._current_idx", 0):
+    with patch("app.services.vector_store._faiss_index") as mock_index, patch(
+        "app.services.vector_store._document_store", {}
+    ), patch("app.services.vector_store._chunk_to_doc", {}), patch(
+        "app.services.vector_store._current_idx", 0
+    ):
         mock_index.ntotal = 0
         yield mock_index
 
@@ -98,14 +109,16 @@ def mock_whisper():
     """Mock Whisper model for testing."""
     with patch("app.services.transcription.get_whisper_model") as mock:
         mock_model = MagicMock()
-        mock_model.transcribe = MagicMock(return_value={
-            "text": "This is test transcription.",
-            "segments": [
-                {"start": 0.0, "end": 5.0, "text": "This is test"},
-                {"start": 5.0, "end": 10.0, "text": "transcription."},
-            ],
-            "language": "en",
-        })
+        mock_model.transcribe = MagicMock(
+            return_value={
+                "text": "This is test transcription.",
+                "segments": [
+                    {"start": 0.0, "end": 5.0, "text": "This is test"},
+                    {"start": 5.0, "end": 10.0, "text": "transcription."},
+                ],
+                "language": "en",
+            }
+        )
         mock.return_value = mock_model
         yield mock
 
@@ -115,8 +128,12 @@ def client(mock_mongodb) -> Generator:
     """Create test client with mocked database."""
     with patch("app.database.mongodb.get_database", return_value=mock_mongodb):
         with patch("app.api.routes.upload.get_database", return_value=mock_mongodb):
-            with patch("app.api.routes.documents.get_database", return_value=mock_mongodb):
-                with patch("app.api.routes.chat.get_database", return_value=mock_mongodb):
+            with patch(
+                "app.api.routes.documents.get_database", return_value=mock_mongodb
+            ):
+                with patch(
+                    "app.api.routes.chat.get_database", return_value=mock_mongodb
+                ):
                     with TestClient(app) as test_client:
                         yield test_client
 
@@ -166,6 +183,7 @@ startxref
 def sample_document() -> dict:
     """Sample document for testing."""
     from datetime import datetime
+
     return {
         "_id": "test-doc-123",
         "filename": "test.pdf",
@@ -187,6 +205,7 @@ def sample_document() -> dict:
 def sample_audio_document() -> dict:
     """Sample audio document for testing."""
     from datetime import datetime
+
     return {
         "_id": "test-audio-123",
         "filename": "test.mp3",

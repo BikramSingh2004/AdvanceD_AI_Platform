@@ -1,12 +1,14 @@
 """Document management API routes."""
+
 import os
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.responses import FileResponse
-from motor.motor_asyncio import AsyncIOMotorDatabase
 from typing import Optional
 
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
 from app.database import get_database
-from app.models import FileType, DocumentResponse, DocumentListResponse
+from app.models import DocumentListResponse, DocumentResponse, FileType
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -22,11 +24,11 @@ async def list_documents(
     query = {}
     if file_type:
         query["file_type"] = file_type.value
-    
+
     cursor = db.documents.find(query).skip(skip).limit(limit).sort("created_at", -1)
     documents = await cursor.to_list(length=limit)
     total = await db.documents.count_documents(query)
-    
+
     return DocumentListResponse(
         documents=[
             DocumentResponse(
@@ -52,10 +54,10 @@ async def get_document(
 ):
     """Get details of a specific document."""
     document = await db.documents.find_one({"_id": document_id})
-    
+
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     return DocumentResponse(
         id=document["_id"],
         filename=document["filename"],
@@ -75,13 +77,13 @@ async def get_document_content(
 ):
     """Get the extracted text content of a document."""
     document = await db.documents.find_one({"_id": document_id})
-    
+
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     if not document["processed"]:
         raise HTTPException(status_code=400, detail="Document not yet processed")
-    
+
     return {
         "id": document["_id"],
         "content": document.get("content", ""),
@@ -89,11 +91,13 @@ async def get_document_content(
     }
 
 
+import os
+
 # here
 from fastapi import Request
 from fastapi.responses import StreamingResponse
 from starlette.status import HTTP_206_PARTIAL_CONTENT
-import os
+
 
 @router.get("/{document_id}/file")
 async def get_document_file(
@@ -149,8 +153,6 @@ async def get_document_file(
     )
 
 
-
-
 # @router.get("/{document_id}/file")
 # async def get_document_file(
 #     document_id: str,
@@ -158,14 +160,14 @@ async def get_document_file(
 # ):
 #     """Download the original file."""
 #     document = await db.documents.find_one({"_id": document_id})
-#     
+#
 #     if not document:
 #         raise HTTPException(status_code=404, detail="Document not found")
-#     
+#
 #     file_path = document["file_path"]
 #     if not os.path.exists(file_path):
 #         raise HTTPException(status_code=404, detail="File not found on disk")
-#     
+#
 #     return FileResponse(
 #         path=file_path,
 #         filename=document["filename"],
@@ -180,24 +182,25 @@ async def delete_document(
 ):
     """Delete a document and its associated data."""
     document = await db.documents.find_one({"_id": document_id})
-    
+
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     # Delete file from disk
     file_path = document["file_path"]
     if os.path.exists(file_path):
         os.remove(file_path)
-    
+
     # Delete from database
     await db.documents.delete_one({"_id": document_id})
     await db.chunks.delete_many({"document_id": document_id})
     await db.chat_history.delete_many({"document_id": document_id})
-    
+
     # Remove from vector store
     from app.services.vector_store import remove_document
+
     await remove_document(document_id)
-    
+
     return {"message": "Document deleted successfully"}
 
 
@@ -208,16 +211,18 @@ async def get_document_timestamps(
 ):
     """Get timestamps for audio/video documents."""
     document = await db.documents.find_one({"_id": document_id})
-    
+
     if not document:
         raise HTTPException(status_code=404, detail="Document not found")
-    
+
     if document["file_type"] not in [FileType.AUDIO.value, FileType.VIDEO.value]:
-        raise HTTPException(status_code=400, detail="Timestamps only available for audio/video files")
-    
+        raise HTTPException(
+            status_code=400, detail="Timestamps only available for audio/video files"
+        )
+
     if not document["processed"]:
         raise HTTPException(status_code=400, detail="Document not yet processed")
-    
+
     return {
         "id": document["_id"],
         "timestamps": document.get("timestamps", []),
