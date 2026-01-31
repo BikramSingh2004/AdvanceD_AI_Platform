@@ -5,12 +5,12 @@ import uuid
 from datetime import datetime
 
 import aiofiles
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile
+from motor.motor_asyncio import AsyncIOMotorDatabase
+
 from app.config import get_settings
 from app.database import get_database
 from app.models import DocumentResponse, FileType
-from fastapi import (APIRouter, BackgroundTasks, Depends, File, HTTPException,
-                     UploadFile)
-from motor.motor_asyncio import AsyncIOMotorDatabase
 
 settings = get_settings()
 router = APIRouter(prefix="/upload", tags=["upload"])

@@ -120,8 +120,9 @@ class TestUploadAPI:
 
     def test_get_file_type_unsupported(self):
         """Test file type detection for unsupported types."""
-        from app.api.routes.upload import get_file_type
         from fastapi import HTTPException
+
+        from app.api.routes.upload import get_file_type
 
         with pytest.raises(HTTPException) as exc_info:
             get_file_type("file.txt")

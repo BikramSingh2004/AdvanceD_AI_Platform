@@ -40,8 +40,7 @@ class TestVectorStore:
                         )
 
                         import app.services.vector_store as vs
-                        from app.services.vector_store import \
-                            initialize_vector_store
+                        from app.services.vector_store import initialize_vector_store
 
                         # Reset state
                         vs._faiss_index = None

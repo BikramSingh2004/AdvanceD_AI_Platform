@@ -6,6 +6,7 @@ import pickle
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
+
 from app.config import get_settings
 from app.models import DocumentChunk, TimestampSegment
 from app.services.pdf_processor import chunk_text

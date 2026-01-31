@@ -4,6 +4,7 @@ import asyncio
 from typing import Any, AsyncGenerator, Dict, List, Optional
 
 import httpx
+
 from app.config import get_settings
 from app.services.transcription import format_timestamp
 from app.services.vector_store import search_similar
